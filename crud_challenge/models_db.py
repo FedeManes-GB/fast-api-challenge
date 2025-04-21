@@ -15,7 +15,7 @@ class Role(Enum):
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     username = Column(String)
     email = Column(String, nullable=False, unique=True)
     first_name = Column(String, nullable=False)
