@@ -1,0 +1,39 @@
+steps:
+
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        if ! gcloud artifacts repositories describe fast-api-challenge --location=us-central1; then
+          echo "Creating Repository..."
+          gcloud artifacts repositories create fast-api-challenge \
+            --repository-format=docker \
+            --location=us-central1 \
+            --description="Repo para FastAPI"
+        else
+          echo "Repository already exists"
+        fi
+  
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build', '-t', 'us-central1-docker.pkg.dev/$_PROJECT_ID/fast-api-challenge/app', '.'
+    ]
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['run', '--rm', 'us-central1-docker.pkg.dev/$PROJECT_ID/fast-api-challenge/app', 'pytest', '-v']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$_PROJECT_ID/fast-api-challenge/app']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    args: [
+      'run', 'deploy', 'fastapi-app',
+      '--image', 'us-central1-docker.pkg.dev/$_PROJECT_ID/fast-api-challenge/app',
+      '--platform', 'managed',
+      '--region', 'us-central1',
+      '--allow-unauthenticated'
+    ]
+
+images:
+  - us-central1-docker.pkg.dev/$PROJECT_ID/fast-api-challenge/app
