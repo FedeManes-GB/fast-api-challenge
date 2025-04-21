@@ -1,16 +1,18 @@
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
+from sqlalchemy import StaticPool, create_engine
 
-from crud_challenge.database import Base, SessionLocal
-from crud_challenge.main import app, get_db
+from crud_challenge.database import Base, SessionLocal, get_db
+from crud_challenge.main import app
 from crud_challenge.models_db import User
 
 
 @pytest.fixture(scope="module")
 def test_db():
     engine = create_engine(
-        "sqlite:///:memory:", connect_args={"check_same_thread": False}
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
     )
 
     Base.metadata.create_all(bind=engine)
@@ -26,7 +28,7 @@ def test_db():
 @pytest.fixture(scope="module")
 def app_with_test_db(test_db):
     def custom_get_db():
-        return test_db
+        yield test_db
 
     app.dependency_overrides[get_db] = custom_get_db
     yield app

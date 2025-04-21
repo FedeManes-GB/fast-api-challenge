@@ -19,7 +19,7 @@ def user_to_dict(user):
 
 
 def test_list_users(client, test_user):
-    response = client.get("/")
+    response = client.get("/users")
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == [user_to_dict(test_user)]
@@ -42,16 +42,18 @@ def test_get_user_fail(client, test_user):
 def test_create_user_succesfull(client, test_user, test_db):
     user_request = {
         "active": True,
-        "email": "fedePost@gmail.com",
+        "email": "fedepost@gmail.com",
         "first_name": "Federico",
-        "last_name": "Test",
+        "last_name": "Testing",
         "role": "admin",
         "username": "fedePost",
     }
     response = client.post("/users/create", json=user_request)
     assert response.status_code == 201
 
-    user_created = test_db.query(User).filter(User.id == 2).first()
+    user_created = (
+        test_db.query(User).filter(User.email == user_request["email"]).first()
+    )
 
     assert user_created.email == user_request["email"]
 
