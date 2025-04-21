@@ -58,23 +58,26 @@ class UserUpdate(BaseModel):
 
 
 class UserCreate(UserRequest):
-    id: Optional[int] = Field(default=None, description=" ID is not needed on create")
-    created_at: Optional[datetime] = Field(
+    id: int = Field(default=None, description=" ID is not needed on create")
+    created_at: datetime = Field(
         default_factory=datetime.now, description="By default it takes datetime.now()"
     )
-    updated_at: Optional[datetime] = Field(
+    updated_at: datetime = Field(
         default_factory=datetime.now, description="Updated when modified"
     )
 
     model_config = {
         "json_schema_extra": {
             "example": {
+                "id": 1,
                 "username": "fede1234",
                 "email": "fede1234@gmail.com",
                 "first_name": "Federico",
                 "last_name": "Test",
                 "role": "admin",
                 "active": True,
+                "created_at": "2025-04-19T23:14:49.155681",
+                "updated_at": "2025-04-19T20:31:16.938253",
             }
         }
     }
